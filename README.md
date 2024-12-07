@@ -5,4 +5,4 @@ basic structure:
     attempt to attack target
       if can't attack target then either out of range or wrong direction
         change direction
-        
+          try again
