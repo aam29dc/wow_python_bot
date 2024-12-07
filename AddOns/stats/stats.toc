@@ -1,7 +1,6 @@
 ## Interface: 11302
-## Title: My First Addon
-## Notes: A simple addon to say "Hello, World!"
-## Author: YourName
+## Title: Stats
+## Notes: show stats, health, power, position, target, etc
+## Author: aam29dc
 ## Version: 1.0
 core.lua
-##frame1.xml
