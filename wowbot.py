@@ -52,6 +52,7 @@ lastPoint = (0,0)
 
 # paths
 path1 = [(607,531),(591,514),(618,489)]
+path2 = [(59.144705533981,78.907120227813), (57.527470588684,73.617911338806), (62.705975770950,69.494158029556), (62.843686342239,66.020977497100), (61.673438549041,63.038480281829)]
 
 def sleepX(seconds):
     # Windows API sleep using high precision timers (nanoseconds)
@@ -112,7 +113,7 @@ def searchEnemy():
                     keyboard.press('1')
                     keyboard.release('1')
 
-                    # first update to check if player is casting, Using regular expression to match C value
+                    # first update to check if player is casting
                     textExtract = extractData()
                     castData = re.search(r"C=([A-Za-z]+)", textExtract).group(1)
 
@@ -132,7 +133,7 @@ def searchEnemy():
                 print('No target data.')
 
 def calcAvgSpeed():
-    # dont move, then move for 1 second in a STRAIGHT line
+    # dont move, then move for 1 second in a STRAIGHT line (on FLATish ground)
     sleepX(1)
     textExtract = extractData()     # get initial position
     iX = float(re.search(r"X=([0-9.]+)", textExtract).group(1))
@@ -150,7 +151,7 @@ def calcAvgSpeed():
         iX = fX
         iY = fY
 
-def RotateWhileForward(rtime):
+def RotateWhileForward(rtime): # used to extract the Angular velocity while moving
     # get initial Angle
     textExtract = extractData()
     iA = float(re.search(r"A=([0-9.]+)", textExtract).group(1))
@@ -162,7 +163,7 @@ def RotateWhileForward(rtime):
     keyboard.release('a')
     keyboard.release('w')
 
-    sleepX(0.1)
+    sleepX(0.01)
 
     textExtract2 = extractData()
     fA = float(re.search(r"A=([0-9.]+)", textExtract2).group(1))
@@ -260,38 +261,36 @@ def gotoPoint(fX, fY):
     print('fX:', fX, 'fY:', fY)
     print('iA:', iA)
 
-    # Calculate time to travel in a straight line towards destination
+    # Calculate time avg to travel in a straight line towards destination
     distance = math.sqrt((fX - iX) ** 2 + (fY - iY) ** 2)
-    print('distance:', distance)
-    travelTime = distance / constSpeed  # Time required to travel this distance
+    print('Distance:', distance)
+    travelTime = distance / constSpeed  # Avg Time required to travel this distance
 
     # Print time till arrival (in seconds)
-    print(f"Time till arrival: {travelTime:.2f} seconds")
+    print(f"Time average till arrival: {travelTime:.2f} seconds")
 
-    firstIter = True   # flag for for iter of loop, to not jump on start
+    firstIter = True    # flag for for iter of loop, to not jump on start
 
-    # Check if player is already there
-    if travelTime >= 0.9: # error tolerance threshold
+    # Check if player is already within a radius of 0.5 units of destination
+    if distance >= 0.5: # error tolerance threshold
         # 1st, while NOT moving, rotate player towards the destination
         rotatePlayerDegree(math.degrees(getAdjustPlayerAngleRad(iA, iX, iY, fX, fY)))   # Rotates player based on Angular difference of the destination position
 
         startTime = time.perf_counter() # start timer after initial rotation
         elapsedTime = 0
 
-        prevSpeed = constSpeed  # start with our globally defined constSpeed
-
         # 2nd, now that we have the angle towards the destination, start moving
         keyboard.press('w')
 
-        # While elapsed time is less than travelTime, move towards the destination
-        while abs(travelTime - elapsedTime) > 0.9:   # error tolerance threshold
-
+        # While player current player position is not within a radius of the destination, continue moving forward
+        # (since we can't reliably get the speed of the player, and if were using screenshots: then use distance instead of time)
+        while abs(distance) > 0.5:   # error tolerance threshold
             # EVERY SECOND, check the Angle and make adjustments towards destination
             # EVERY SECOND, if the player is stuck then jump
             if abs(elapsedTime - round(elapsedTime)) <= 0.0001:  # error tolerance threshold for going over a integer
                 print('Adjusting angle')
                 textExtract = extractData() # takes about 0.25s on my machine
-                pX = iX # previous x position
+                pX = iX # previous x position, used to check if player is stuck
                 pY = iY # previous y position
                 iX = float(re.search(r"X=([0-9.]+)", textExtract).group(1))
                 iY = float(re.search(r"Y=([0-9.]+)", textExtract).group(1))
@@ -300,7 +299,6 @@ def gotoPoint(fX, fY):
                 # get Angle and time for a 'rotation WHILE moving'
                 rotateAngle = math.degrees(getAdjustPlayerAngleRad(iA, iX, iY, fX, fY))
                 rotateTime = math.radians(abs(rotateAngle)) / constAVrad360Moving[1]
-
                 # rotate left
                 if rotateAngle > 0:
                     keyboard.press('a')
@@ -312,19 +310,15 @@ def gotoPoint(fX, fY):
                     sleepX(rotateTime)
                     keyboard.release('d')
 
-                # jump if stuck
+                # jump if stuck ( within the same small radius for a second then jump)
                 if abs(pX - iX) < 0.1 and abs(pY - iY) < 0.1 and firstIter == False:
                     keyboard.press(Key.space)
                     keyboard.release(Key.space)
 
             elapsedTime = time.perf_counter() - startTime
-            firstIter = False   # don't jump
-            """print('speed: ', speed)
-            print('dist: ', distance)
-            print('tt: ', travelTime)
-            print('start: ', startTime)
-            print('elapsed: ', elapsedTime)
-            print('tt-e: ', travelTime - elapsedTime)"""
+            firstIter = False   # don't jump first iteration
+            distance = math.sqrt((fX - iX) ** 2 + (fY - iY) ** 2)
+            #print('Distance: ', distance)
         
         keyboard.release('w')
         print('Player arrived.')
@@ -335,8 +329,28 @@ def startPath(path):
     print('Starting path...')
     # calc the distance between current position and each point of path
     # attempt to go to the point of the shortest distance
-    for i, (x, y) in enumerate(path1, start=1):
-        x, y = convertImageToMapCoords(x, y)
+
+    # get initial position
+    textExtract = extractData()
+    initial = [None, None]
+    # initial point is in Map coords
+    initial[0] = float(re.search(r"X=([0-9.]+)", textExtract).group(1))
+    initial[1] = float(re.search(r"Y=([0-9.]+)", textExtract).group(1))
+
+    def calcDistance(pt1, pt2):
+        return math.sqrt((pt1[0] - pt2[0])**2 + (pt1[1] - pt2[1])**2)
+    
+    # calc distances between each point
+    distances = []
+    for pt in path:
+        # distances.append(calcDistance(initial, convertImageToMapCoords(pt[0], pt[1]))) # Paths are defined in Image coords
+        distances.append(calcDistance(initial, (pt[0], pt[1]))) # Paths are defined in Image coords
+
+    minIndex = distances.index(min(distances))
+
+    # start going to nearest point, then complete path
+    for i, (x, y) in enumerate(path[minIndex:], start=minIndex):
+        # x, y = convertImageToMapCoords(x, y)
         print('Going to waypoint: ', i)
         print('x: ', x)
         print('y: ', y)
@@ -370,11 +384,11 @@ def createWaypoint(textExtract):
     # Use the matched values if found, otherwise fallback to 'x', 'y', 'a'
     x_value = x_match.group(1) if x_match else 'x'
     y_value = y_match.group(1) if y_match else 'y'
-    a_value = a_match.group(1) if a_match else 'a'
+    #a_value = a_match.group(1) if a_match else 'a'
 
     # Write the values to the file
     with open('wayPoints.txt', 'a') as wayPoints:
-        wayPoints.write(f'{x_value} {y_value} {a_value}\n')
+        wayPoints.write(f'({x_value},{y_value}), ')
 
 def writePath():
     # record waypoints at 1s intervals for 10 seconds
@@ -421,15 +435,11 @@ if window:
     if Retail:print('---WoW RETAIL---')
     else:print('---WoW CLASSIC---')
 
-    # global to hold our average extract data time
-    #extractDataAvgTime = extractDataTime()  # on my machine takes about 0.25s
-    #print(extractDataAvgTime)
+    #gotoPoint(59.0, 79.0)
 
+    startPath(path2)
     #textExtract = extractData()
-    #gotoPoint(58.175939321517, 73.954319953918)
-    #rotatePlayerDegree(180)
-    #rotPlayer(0.4975)
-    startPath(path1)
+    #createWaypoint(textExtract)
 
     wayPoints.flush()
 
