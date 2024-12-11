@@ -10,3 +10,5 @@ Using this we can reliably get the bot to follow a path, which I successfully wa
 
 ![data](https://github.com/user-attachments/assets/bc2066c4-fc69-4b4b-81aa-ac61f9fcb00d)
 <br>(this is a screenshot that our program uses to get info about the player ingame: Health, Power, X, Y, Angle, Target, Casting)
+
+(Why this method of botting would be better than some of the alternatives:) No DLL injection, or altering the game process. With a little bit of randomization this method would have a low probability as being detected as a bot.
