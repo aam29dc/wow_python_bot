@@ -6,54 +6,31 @@ dataFrame:SetSize(325, 330)
 dataFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 10)
 dataFrame:Hide()
 
--- Create font strings for each stat
-local hpText = dataFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-hpText:SetPoint("TOPLEFT", dataFrame, "TOPLEFT", 10, -15)
-hpText:SetTextColor(1, 1, 1)
-hpText:SetAlpha(1)
-hpText:SetFont("Fonts\\FRIZQT__.TTF", 22, "OUTLINE")
-hpText:SetShadowOffset(2, -2)
-hpText:SetShadowColor(0, 0, 0, 1)
+-- Helper function to create font strings
+local function CreateStatText(parent, anchor, rel, xOffset, yOffset)
+    local statText = parent:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    statText:SetPoint("TOPLEFT", anchor, rel or "BOTTOMLEFT", xOffset or 0, yOffset or -5)
+    statText:SetTextColor(1, 1, 1)
+    statText:SetAlpha(1)
+    statText:SetFont("Fonts\\FRIZQT__.TTF", 26, "OUTLINE")
+    statText:SetShadowOffset(2, -2)
+    statText:SetShadowColor(0, 0, 0, 1)
+    return statText
+end
 
-local powerText = dataFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-powerText:SetPoint("TOPLEFT", hpText, "BOTTOMLEFT", 0, -5)
-powerText:SetTextColor(1, 1, 1)
-powerText:SetAlpha(1)
-powerText:SetFont("Fonts\\FRIZQT__.TTF", 22, "OUTLINE")
-powerText:SetShadowOffset(2, -2)
-powerText:SetShadowColor(0, 0, 0, 1)
+-- Create font strings for each stat using the helper function
+local hpText = CreateStatText(dataFrame, dataFrame, "TOPLEFT", 10, -15)
+local powerText = CreateStatText(dataFrame, hpText)
+local positionXText = CreateStatText(dataFrame, powerText)
+local positionYText = CreateStatText(dataFrame, positionXText)
+local angleText = CreateStatText(dataFrame, positionYText)
 
-local positionXText = dataFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-positionXText:SetPoint("TOPLEFT", powerText, "BOTTOMLEFT", 0, -5)
-positionXText:SetTextColor(1, 1, 1)
-positionXText:SetAlpha(1)
-positionXText:SetFont("Fonts\\FRIZQT__.TTF", 22, "OUTLINE")
-positionXText:SetShadowOffset(2, -2)
-positionXText:SetShadowColor(0, 0, 0, 1)
+local targetText = CreateStatText(dataFrame, angleText)
+local castingText = CreateStatText(dataFrame, targetText)
 
-local positionYText = dataFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-positionYText:SetPoint("TOPLEFT", positionXText, "BOTTOMLEFT", 0, -5)
-positionYText:SetTextColor(1, 1, 1)
-positionYText:SetAlpha(1)
-positionYText:SetFont("Fonts\\FRIZQT__.TTF", 22, "OUTLINE")
-positionYText:SetShadowOffset(2, -2)
-positionYText:SetShadowColor(0, 0, 0, 1)
-
-local targetText = dataFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-targetText:SetPoint("TOPLEFT", positionYText, "BOTTOMLEFT", 0, -5)
-targetText:SetTextColor(1, 1, 1)
-targetText:SetAlpha(1)
-targetText:SetFont("Fonts\\FRIZQT__.TTF", 22, "OUTLINE")
-targetText:SetShadowOffset(2, -2)
-targetText:SetShadowColor(0, 0, 0, 1)
-
-local castingText = dataFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-castingText:SetPoint("TOPLEFT", targetText, "BOTTOMLEFT", 0, -5)
-castingText:SetTextColor(1, 1, 1)
-castingText:SetAlpha(1)
-castingText:SetFont("Fonts\\FRIZQT__.TTF", 20, "OUTLINE")
-castingText:SetShadowOffset(2, -2)
-castingText:SetShadowColor(0, 0, 0, 1)
+--[[
+    Errors: map coords are from (0,0) to (1,1), if player goes outside this region the addon turns off
+]]--
 
 -- Function to update the stats
 local function UpdateStats()
@@ -67,30 +44,40 @@ local function UpdateStats()
     px = px * 100
     py = py * 100
 
-    -- Check if target is attackable and if it is dead
+    -- Get player angle
+    local playerAngle = GetPlayerFacing()
+
+    -- Get if target is attackable and if it is dead
     local targetExists = UnitExists("target")
     local isEnemy = targetExists and UnitCanAttack("player", "target")
     local isDead = targetExists and UnitIsDead("target")
 
-    -- Check if player is casting
-    local isCasting = UnitCastingInfo("player")
-    local castingStatus = isCasting and "T" or "F" -- If casting, show "T" else "F"
+    -- Get if player is casting
+    local castingStatus = UnitCastingInfo("player") and "T" or "F" -- If casting, show "T" else "F"
 
     -- Update the text for each stat
-    hpText:SetText(string.format(" H = %.2f", hpPercent))
-    powerText:SetText(string.format(" P = %.2f", powerPercent))
-    positionXText:SetText(string.format(" X = %.2f", px))
-    positionYText:SetText(string.format(" Y = %.2f", py))
+    local fractHP = string.gsub(hpPercent % 1, "0%.", "")
+    hpText:SetText(string.format(" H=%d.%s", math.floor(hpPercent), string.sub(fractHP, 1, 2)))
 
-    -- Update the target status (Dead, Enemy, Friendly, No target)
+    local fractPower = string.gsub(powerPercent % 1, "0%.", "")
+    powerText:SetText(string.format(" P=%d.%s", math.floor(powerPercent), string.sub(fractPower, 1, 2)))
+    -- max #s after . is 15
+    local fractX = string.gsub(px % 1, "0%.", "")
+    positionXText:SetText(string.format(" X=%d.%s", math.floor(px), string.sub(fractX, 1, 12)))
+
+    local fractY = string.gsub(py % 1, "0%.", "")
+    positionYText:SetText(string.format(" Y=%d.%s", math.floor(py), string.sub(fractY, 1, 12)))
+
     if isDead then
-        targetText:SetText(" T = D")
+        targetText:SetText(" T=D")
     else
-        targetText:SetText(string.format(" T = %s", targetExists and (isEnemy and "E" or "F") or "N"))
+        targetText:SetText(string.format(" T=%s", targetExists and (isEnemy and "E" or "F") or "N"))
     end
 
-    -- Update casting status (T for casting, F for not casting)
-    castingText:SetText(string.format(" C = %s", castingStatus))
+    castingText:SetText(string.format(" C=%s", castingStatus))
+
+    local fractAngle = string.gsub(playerAngle % 1, "0%.", "")
+    angleText:SetText(string.format(" A=%d.%s", math.floor(playerAngle), string.sub(fractAngle, 1, 12)))
 end
 
 -- Toggle the visibility of the data frame
@@ -104,9 +91,23 @@ local function TogglePosDisplay()
     isDataVis = not isDataVis
 end
 
+local function getZcoord()
+    print(UnitPosition("player"))
+    local mapID = C_Map.GetBestMapForUnit("player")
+    local pos = C_Map.GetPlayerMapPosition(mapID, "player")
+    local continentID, worldPos = C_Map.GetWorldPosFromMapPos(mapID, pos)
+    print("Continent ID:", continentID, "World Position:", "x =", worldPos.x, "y =", worldPos.y, "z =", worldPos.z)
+    print("You are in ", C_Map.GetMapInfo(mapID).name, mapID)
+    print(mapID)
+    print("Player's angle (in radians): ", GetPlayerFacing())
+end
+
 -- Slash command to toggle visibility
 SLASH_STATS1 = "/stats"
 SlashCmdList["STATS"] = TogglePosDisplay
+
+SLASH_Z1 = "/z"
+SlashCmdList["Z"] = getZcoord
 
 -- Update stats on every frame
 dataFrame:SetScript("OnUpdate", function(self, elapsed)
