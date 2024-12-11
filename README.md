@@ -8,3 +8,4 @@ Since we can't directly get the velocity of the bots (positional) speed, I got a
 Using this we can reliably get the bot to follow a path, which I successfully was able to complete in wowbot.py<br>
 
 ![data](https://github.com/user-attachments/assets/bc2066c4-fc69-4b4b-81aa-ac61f9fcb00d)
+(this is a screenshot that our program uses to get info about the player ingame: Health, Power, X, Y, Angle, Target, Casting)
