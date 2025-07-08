@@ -11,8 +11,9 @@ As bot follows a path it makes micro adjustments of the angle towards the point,
 
 Using this we can reliably get the bot to follow a path, which I successfully was able to complete in `wowbot.py`<br>
 
-Has a basic search enemy function that'll keep casting/pressing 1 until enemy state is dead.
-Can implement a path by using WoWs maps (from a online database), then color code it to create paths. Then can pull waypoints from the online db for quests, towns, etc. Bot would choose a path based on the position of the quest giver, etc.
+Has a basic search enemy function that'll keep casting/pressing 1 until enemy state is dead.<br>
+
+Can implement paths by using WoWs maps (from a online database), then color code it to create paths. Then can pull waypoints from the online db for quests, towns, etc. Bot would choose a path based on the position of the quest giver, etc. Would require some sort of trial and error testing on the paths or a good enough algorithm if bot gets stuck.
 
 ![data](https://github.com/user-attachments/assets/bc2066c4-fc69-4b4b-81aa-ac61f9fcb00d)
 <br>(this is a screenshot that our program uses to get info about the player ingame: Health, Power, X, Y, Angle, Target, Casting)
