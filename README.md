@@ -25,7 +25,7 @@ Could write an algoritm that corrects paths in the map for no collisions, for se
 
 If we use static elements in the UI, inventory management, going to vendors, learning new skills, etc can all be done. So basically a fully functional bot can be written using this method.<br>
 
-The downsides: some elements of data aren't available for more accurate readings on gamestate, like the position of the target enemy their angle, etc A fix to this would be to turn to an angle that cannot attack the target and based on this angle we can derive an angle that would make our character look straight at the target.<br>
+The downsides: some elements of data aren't available for more accurate readings on gamestate, like the position of the target enemy their angle, etc A fix to this would be to turn to an angle that cannot attack the target and based on this angle we can derive an angle that would make our character look straight at the target. Some skills from classes in the game could make things easier. Again it helps to understand the WoW API and game mechanics when developing a bot this way. <br>
 
 ![data](https://github.com/user-attachments/assets/bc2066c4-fc69-4b4b-81aa-ac61f9fcb00d)
 <br>(this is a screenshot that our program uses to get info about the player ingame: Health, Power, X, Y, Angle, Target, Casting)
