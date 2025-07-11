@@ -12,7 +12,7 @@ Using this we can reliably get the bot to follow a path, which I successfully wa
 Has a basic search enemy function that'll keep casting/pressing 1 until enemy state is dead.<br>
 
 ![data](https://github.com/user-attachments/assets/bc2066c4-fc69-4b4b-81aa-ac61f9fcb00d)
-<br><br>(this is a screenshot that our program uses to get info about the player ingame: Health, Power, X, Y, Angle, Target, Casting)
+<br>(this is a screenshot that our program uses to get info about the player ingame: Health, Power, X, Y, Angle, Target, Casting)<br>
 No Z-axis data available. Speed is effected by the Z-axis (since our speed was determined by distance traveled in time), and since we can't get this (Z) data from in-game, we would have to use our screenshots to get reliable info on the bots current position. Therefore it checks the bots position every second to see if its within a radius of the next point.<br>
 
 [[Ideas]]
