@@ -1,6 +1,8 @@
 uses my WoW addon to print data to screen to use, then takes this data from a screenshot, and uses that data to interact with the game<br>
 
-important things to consider: WoWs API doesn't make it easy to make bots, for example if I have a target, the UI won't give their position location, but there are other options. Like using the minimap, etc<br>
+(Creating a bot can be an intensive task; understand the WoW API and the game mechanics.) <br>
+
+important things to consider: WoWs API doesn't make it easy to make bots, for example if I have a target, the UI won't give their position location, but there are other options.<br>
 It helps to understand the game mechanics when developing a bot: (like you can't tab target an enemy behind you, etc).
 
 Bot can successfully follow a predefined path. I extrapolated the Angular Velocity graph using the time it takes to rotate at specific angles, this is important to make the bot go in the correct direction. There are two Angular Velocities, one for standing still and another while moving.<br>
@@ -13,7 +15,17 @@ Using this we can reliably get the bot to follow a path, which I successfully wa
 
 Has a basic search enemy function that'll keep casting/pressing 1 until enemy state is dead.<br>
 
-Can implement paths by using WoWs maps (from a online database), then color code it to create paths. Then can pull waypoints from the online db for quests, towns, etc. Bot would choose a path based on the position of the quest giver, etc. Would require some sort of trial and error testing on the paths or a good enough algorithm if bot gets stuck.
+Can implement paths by using WoWs maps (from a online database), then color code it to create paths. Then can pull waypoints from the online db for quests, towns, etc. Bot would choose a path based on the position of the quest giver, etc. Would require some sort of trial and error testing on the paths or a good enough algorithm if bot gets stuck. If bot gets stuck we can simply go reverse and change slight direction on node of path.
+
+For example to loot we could swipe the mouse across the screen fast and check if a loot cursor appears using the UI, then based on the distance of the mouse cursor from the center of the screen we can know where to move, and if loot cursor shows up lootable we're in distance. I don't think their is distance data in UI besides out of range.
+
+We can get data if our character is dead in the UI, and have our saved location before death. Then use one of the paths we developed for the map (these paths have no collisions) to get to that destination (using some path finding algorithm). <br>
+
+Could write an algoritm that corrects paths in the map for no collisions, for self correcting behavior and a system that gets better over time rather than hardcoding. Start off with a path developed in the map, program reads it, stores the path, and bot uses it and self corrects nodes in path for no collision, and faster destination. <br>
+
+If we use static elements in the UI, inventory management, going to vendors, learning new skills, etc can all be done. So basically a fully functional bot can be written using this method.<br>
+
+The downsides: some elements of data aren't available for more accurate readings on gamestate, like the position of the target enemy their angle, etc A fix to this would be to turn to an angle that cannot attack the target and based on this angle we can derive an angle that would make our character look straight at the target.<br>
 
 ![data](https://github.com/user-attachments/assets/bc2066c4-fc69-4b4b-81aa-ac61f9fcb00d)
 <br>(this is a screenshot that our program uses to get info about the player ingame: Health, Power, X, Y, Angle, Target, Casting)
