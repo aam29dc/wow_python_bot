@@ -17,7 +17,7 @@ No Z-axis data available. Speed is effected by the Z-axis (since our speed was d
 
 [[Ideas]]
 
-Can implement paths easily by using WoWs maps (from a online database), then color code it to create paths cread by the program. Then pull waypoints from the online db for quests, towns, etc. Bot would choose a path based on the position of the quest giver, etc. Would require some sort of trial and error testing on the paths or a good enough algorithm if bot gets stuck: If bot gets stuck we can simply go reverse and change slight direction on node of path, as of now the bot only jumps if stuck.
+Can implement paths easily by using WoWs maps (from a online database), then color code it to create paths read by the program. Then pull waypoints from the online db for quests, towns, etc. Bot would choose a path based on the position of the quest giver, etc. Would require some sort of trial and error testing on the paths or a good enough algorithm if bot gets stuck: If bot gets stuck we can simply go reverse and change slight direction on node of path, as of now the bot only jumps if stuck.
 
 To loot we could swipe the mouse across the screen fast and check if a loot cursor appears using the UI, then based on the distance of the mouse cursor from the center of the screen we can know where to move, and if loot cursor shows up lootable we're in distance. I don't think there is distance data in UI besides out of range, it always helps to understand what data WoW is giving you.
 
