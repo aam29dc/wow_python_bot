@@ -27,4 +27,5 @@ If we use static elements in the UI, inventory management, going to vendors, lea
 The downsides: some elements of data aren't available for more accurate readings on gamestate, like the position of the target enemy their angle, etc A fix to this would be to turn to an angle that cannot attack the target and based on this angle we can derive an angle that would make our character look straight at the target. Some skills from classes in the game could make things easier. Again it helps to understand the WoW API and game mechanics when developing a bot this way.<br>
 
 ``[[no injections]]``
+
 (Why this method of botting would be better than some of the alternatives:) No DLL injection, or altering the game process. With a little bit of randomization this method would have a low probability as being detected as a bot.
