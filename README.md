@@ -14,11 +14,11 @@ Has a basic search enemy function that'll keep casting/pressing 1 until enemy st
 ![data](https://github.com/user-attachments/assets/bc2066c4-fc69-4b4b-81aa-ac61f9fcb00d)
 <br>(this is a screenshot that our program uses to get info about the player ingame: Health, Power, X, Y, Angle, Target, Casting)<br>
 
-No Z-axis data available. Speed is effected by the Z-axis (since our speed was determined by distance traveled in time), and since we can't get this (Z) data from in-game, we would have to use our screenshots to get reliable info on the bots current position. Therefore it checks the bots position every second to see if its within a radius of the next point.<br>
+No Z-axis data available. Speed is effected by the Z-axis, and since we can't get this (Z) data from in-game, we use our screenshots to get reliable info on the bots current position and speed.<br>
 
 ``[[Ideas]]``
 
-Can implement paths easily by using WoWs maps (from a online database), then color code it to create paths read by the program. Then pull waypoints from the online db for quests, towns, etc. Bot would choose a path based on the position of the quest giver, etc. Would require some sort of trial and error testing on the paths or a good enough algorithm if bot gets stuck: If bot gets stuck we can simply go reverse and change slight direction on node of path, as of now the bot only jumps if stuck.
+Can implement paths easily by using WoWs maps (from a online database), then color code it in Paint to create paths read by the program. Then pull waypoints from the online db for quests, towns, etc. Bot would choose a path based on the position of the quest giver, etc. Would require some sort of trial and error testing on the paths or a good enough algorithm if bot gets stuck: If bot gets stuck we can simply go reverse and change slight direction on node of path, as of now the bot only jumps if stuck.
 
 Write an algoritm that corrects paths in the map for no collisions, for self correcting behavior and a system that gets better over time rather than hardcoding. Start off with a path developed in the map, program reads it, stores the path, and bot uses it and self corrects nodes in path for no collision, and faster destination. <br>
 
